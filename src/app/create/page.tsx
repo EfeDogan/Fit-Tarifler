@@ -4,6 +4,7 @@ import { useRecipes } from "@/lib/recipes";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useRef, useState, useEffect } from "react";
 import type { Label } from "@/types/database";
+import TiptapEditor from "@/components/TiptapEditor";
 
 const MAX_IMAGES = 3;
 
@@ -130,14 +131,7 @@ function CreateRecipeForm() {
           >
             Tarif İçeriği
           </label>
-          <textarea
-            id="content"
-            name="content"
-            required
-            rows={12}
-            placeholder="Malzemeler ve hazırlanış adımlarını yazın..."
-            className="w-full px-4 py-3 border border-gray-200 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent resize-y leading-relaxed"
-          />
+          <TiptapEditor name="content" />
         </div>
 
         <div>

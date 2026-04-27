@@ -10,57 +10,55 @@ export default function RecipeCard({ recipe }: { recipe: Recipe }) {
 
   return (
     <Link href={`/recipe/${recipe.id}`}>
-      <article className="border border-gray-100 rounded-xl overflow-hidden group cursor-pointer transition-shadow hover:shadow-md">
+      <article className="relative aspect-[4/5] rounded-2xl overflow-hidden group cursor-pointer transition-all duration-300 hover:shadow-xl">
         {firstImage ? (
-          <div className="relative aspect-[4/3] bg-gray-50">
-            <Image
-              src={firstImage}
-              alt={recipe.title}
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-300"
-              sizes="(max-width: 640px) 100vw, 50vw"
-            />
-          </div>
+          <Image
+            src={firstImage}
+            alt={recipe.title}
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          />
         ) : (
-          <div className="aspect-[4/3] bg-gray-50 flex items-center justify-center">
-            <span className="text-gray-300 text-4xl">🍽</span>
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200" />
+        )}
+
+        {recipe.labels && recipe.labels.length > 0 && (
+          <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10">
+            {recipe.labels.slice(0, 3).map((label) => (
+              <span
+                key={label.id}
+                className="px-2 py-0.5 rounded-full text-[10px] font-semibold text-white bg-black/30 backdrop-blur-sm"
+                style={{ borderLeft: `2px solid ${label.color}` }}
+              >
+                {label.name}
+              </span>
+            ))}
           </div>
         )}
 
-        <div className="p-4">
-          {recipe.labels && recipe.labels.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mb-2.5">
-              {recipe.labels.slice(0, 3).map((label) => (
-                <span
-                  key={label.id}
-                  className="px-2 py-0.5 rounded-full text-[11px] font-medium text-white"
-                  style={{ backgroundColor: label.color }}
-                >
-                  {label.name}
-                </span>
-              ))}
-            </div>
-          )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-          <h2 className="text-lg font-bold mb-1 group-hover:text-gray-600 transition-colors line-clamp-1">
+        <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
+          <h2 className="text-white font-semibold text-[15px] leading-snug line-clamp-1 mb-1 drop-shadow-sm">
             {recipe.title}
           </h2>
 
           {recipe.description && (
-            <p className="text-gray-500 text-sm line-clamp-2 leading-relaxed mb-3">
+            <p className="text-white/70 text-xs leading-relaxed line-clamp-2 mb-1.5">
               {recipe.description}
             </p>
           )}
 
-          <div className="flex items-center gap-2 text-xs text-gray-400 pt-2 border-t border-gray-50">
-            <span className="font-medium text-gray-500">
+          <div className="flex items-center gap-1.5 text-[11px] text-white/60">
+            <span className="font-medium">
               {recipe.profiles?.username}
             </span>
             <span>·</span>
             <span>
               {new Date(recipe.created_at).toLocaleDateString("tr-TR", {
                 day: "numeric",
-                month: "long",
+                month: "short",
               })}
             </span>
           </div>

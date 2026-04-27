@@ -1,18 +1,56 @@
 import { createClient } from "@/lib/supabase/server";
 import RecipeCard from "@/components/RecipeCard";
+import FeedFilters from "@/components/FeedFilters";
 import type { Recipe } from "@/types/database";
+import { Suspense } from "react";
 
-export default async function HomePage() {
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ labels?: string }>;
+}) {
+  const { labels: labelsParam } = await searchParams;
   const supabase = await createClient();
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: recipes, error: recipesError } = await supabase
+  let recipesQuery = supabase
     .from("recipes")
     .select(`*, profiles!author_id(username), labels(id, name, slug, color)`)
     .order("created_at", { ascending: false });
+
+  if (labelsParam) {
+    const labelSlugs = labelsParam.split(",").filter(Boolean);
+    if (labelSlugs.length > 0) {
+      const { data: matchedLabels } = await supabase
+        .from("labels")
+        .select("id")
+        .in("slug", labelSlugs);
+
+      const labelIds = matchedLabels?.map((l) => l.id) ?? [];
+
+      if (labelIds.length > 0) {
+        const { data: recipeIds } = await supabase
+          .from("recipe_labels")
+          .select("recipe_id")
+          .in("label_id", labelIds);
+
+        const uniqueRecipeIds = [
+          ...new Set(recipeIds?.map((r) => r.recipe_id) ?? []),
+        ];
+
+        if (uniqueRecipeIds.length > 0) {
+          recipesQuery = recipesQuery.in("id", uniqueRecipeIds);
+        } else {
+          recipesQuery = recipesQuery.eq("id", "00000000-0000-0000-0000-000000000000");
+        }
+      }
+    }
+  }
+
+  const { data: recipes, error: recipesError } = await recipesQuery;
 
   let likedRecipeIds: string[] = [];
   let savedRecipeIds: string[] = [];
@@ -47,6 +85,12 @@ export default async function HomePage() {
         </p>
       </div>
 
+      <div className="mb-6">
+        <Suspense>
+          <FeedFilters />
+        </Suspense>
+      </div>
+
       {recipesError && (
         <div className="bg-red-50 text-red-600 text-sm p-4 rounded-lg my-6">
           Tarifler yüklenirken hata oluştu: {recipesError.message}
@@ -61,7 +105,7 @@ export default async function HomePage() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {recipesWithLikes.map((recipe) => (
             <RecipeCard key={recipe.id} recipe={recipe} />
           ))}

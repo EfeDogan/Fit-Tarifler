@@ -111,9 +111,10 @@ export default async function RecipeDetailPage({
 
         <ImageGallery images={images} />
 
-        <div className="whitespace-pre-wrap text-gray-700 leading-relaxed text-lg">
-          {recipe.content}
-        </div>
+        <div
+          className="prose prose-gray max-w-none text-gray-700 leading-relaxed text-lg"
+          dangerouslySetInnerHTML={{ __html: recipe.content }}
+        />
 
         {isOwner && (
           <div className="mt-10 pt-6 border-t border-gray-100 flex items-center gap-4">
