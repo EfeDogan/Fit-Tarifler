@@ -22,6 +22,11 @@ export function useRecipes() {
     const content = formData.get("content") as string;
     const labelIds = formData.getAll("labels") as string[];
 
+    const calories = formData.get("calories") as string;
+    const protein = formData.get("protein") as string;
+    const carbs = formData.get("carbs") as string;
+    const fat = formData.get("fat") as string;
+
     const imageFiles = formData.getAll("images") as File[];
     const image_urls: string[] = [];
 
@@ -52,6 +57,10 @@ export function useRecipes() {
         content,
         image_urls,
         author_id: user.id,
+        calories: calories ? parseInt(calories) : null,
+        protein: protein ? parseInt(protein) : null,
+        carbs: carbs ? parseInt(carbs) : null,
+        fat: fat ? parseInt(fat) : null,
       })
       .select("id")
       .single();

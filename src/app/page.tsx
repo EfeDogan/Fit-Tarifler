@@ -7,14 +7,10 @@ import { Suspense } from "react";
 export default async function HomePage({
   searchParams,
 }: {
-  searchParams: Promise<{ labels?: string }>;
+  searchParams: Promise<{ labels?: string; minProtein?: string; maxCalories?: string; maxCarbs?: string; maxFat?: string }>;
 }) {
-  const { labels: labelsParam } = await searchParams;
+  const { labels: labelsParam, minProtein, maxCalories, maxCarbs, maxFat } = await searchParams;
   const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
   let recipesQuery = supabase
     .from("recipes")
@@ -50,22 +46,42 @@ export default async function HomePage({
     }
   }
 
-  const { data: recipes, error: recipesError } = await recipesQuery;
+  if (minProtein) {
+    recipesQuery = recipesQuery.gte("protein", parseInt(minProtein));
+  }
+  if (maxCalories) {
+    recipesQuery = recipesQuery.lte("calories", parseInt(maxCalories));
+  }
+  if (maxCarbs) {
+    recipesQuery = recipesQuery.lte("carbs", parseInt(maxCarbs));
+  }
+  if (maxFat) {
+    recipesQuery = recipesQuery.lte("fat", parseInt(maxFat));
+  }
+
+  const [
+    { data: recipes, error: recipesError },
+    { data: { user } },
+  ] = await Promise.all([
+    recipesQuery,
+    supabase.auth.getUser(),
+  ]);
 
   let likedRecipeIds: string[] = [];
   let savedRecipeIds: string[] = [];
 
   if (user) {
-    const { data: likes } = await supabase
-      .from("likes")
-      .select("recipe_id")
-      .eq("user_id", user.id);
+    const [{ data: likes }, { data: saves }] = await Promise.all([
+      supabase
+        .from("likes")
+        .select("recipe_id")
+        .eq("user_id", user.id),
+      supabase
+        .from("saves")
+        .select("recipe_id")
+        .eq("user_id", user.id),
+    ]);
     likedRecipeIds = likes?.map((l) => l.recipe_id) ?? [];
-
-    const { data: saves } = await supabase
-      .from("saves")
-      .select("recipe_id")
-      .eq("user_id", user.id);
     savedRecipeIds = saves?.map((s) => s.recipe_id) ?? [];
   }
 

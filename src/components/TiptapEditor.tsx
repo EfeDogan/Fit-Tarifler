@@ -41,6 +41,7 @@ export default function TiptapEditor({
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [content, setContent] = useState(defaultValue || "");
+  const [isDragging, setIsDragging] = useState(false);
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -77,10 +78,7 @@ export default function TiptapEditor({
     insertImage(imageUrl);
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  const uploadAndInsert = async (file: File) => {
     setUploading(true);
     try {
       const supabase = createClient();
@@ -106,7 +104,38 @@ export default function TiptapEditor({
       alert("Görsel yüklenirken hata oluştu.");
     } finally {
       setUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    await uploadAndInsert(file);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const files = Array.from(e.dataTransfer.files).filter((f) =>
+      f.type.startsWith("image/")
+    );
+    for (const file of files) {
+      await uploadAndInsert(file);
     }
   };
 
@@ -161,7 +190,20 @@ export default function TiptapEditor({
   };
 
   return (
-    <div className="border border-gray-200 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-black focus-within:border-transparent">
+    <div
+      className={`relative border border-gray-200 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-black focus-within:border-transparent ${isDragging ? "ring-2 ring-blue-400 border-blue-400" : ""}`}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
+      {isDragging && (
+        <div className="absolute inset-0 z-20 bg-blue-50/80 backdrop-blur-sm flex items-center justify-center pointer-events-none">
+          <div className="text-blue-600 font-medium text-sm flex items-center gap-2">
+            <span className="text-lg">📥</span>
+            Görseli buraya bırakın
+          </div>
+        </div>
+      )}
       <div className="flex flex-wrap items-center gap-0.5 px-2 py-1.5 border-b border-gray-100 bg-gray-50/50">
         {TOOLBAR.map((btn, i) => (
           <span key={btn.label} className="flex items-center">

@@ -12,21 +12,17 @@ export async function toggleLike(recipeId: string) {
 
   if (!user) return;
 
-  const { data: existing } = await supabase
+  const { count } = await supabase
     .from("likes")
-    .select()
+    .delete({ count: "exact" })
     .eq("user_id", user.id)
-    .eq("recipe_id", recipeId)
-    .single();
+    .eq("recipe_id", recipeId);
 
-  if (existing) {
-    await supabase.from("likes").delete().eq("user_id", user.id).eq("recipe_id", recipeId);
-  } else {
+  if (count === 0) {
     await supabase.from("likes").insert({ user_id: user.id, recipe_id: recipeId });
   }
 
   revalidatePath(`/recipe/${recipeId}`);
-  revalidatePath("/");
 }
 
 export async function toggleSave(recipeId: string) {
@@ -38,20 +34,16 @@ export async function toggleSave(recipeId: string) {
 
   if (!user) return;
 
-  const { data: existing } = await supabase
+  const { count } = await supabase
     .from("saves")
-    .select()
+    .delete({ count: "exact" })
     .eq("user_id", user.id)
-    .eq("recipe_id", recipeId)
-    .single();
+    .eq("recipe_id", recipeId);
 
-  if (existing) {
-    await supabase.from("saves").delete().eq("user_id", user.id).eq("recipe_id", recipeId);
-  } else {
+  if (count === 0) {
     await supabase.from("saves").insert({ user_id: user.id, recipe_id: recipeId });
   }
 
   revalidatePath(`/recipe/${recipeId}`);
-  revalidatePath("/");
   revalidatePath("/profile");
 }

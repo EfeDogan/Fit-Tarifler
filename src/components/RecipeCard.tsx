@@ -39,6 +39,14 @@ export default function RecipeCard({ recipe }: { recipe: Recipe }) {
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
+        {recipe.calories != null && (
+          <div className="absolute top-3 right-3 z-10">
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-black/40 backdrop-blur-sm text-white">
+              {recipe.calories} kcal
+            </span>
+          </div>
+        )}
+
         <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
           <h2 className="text-white font-semibold text-[15px] leading-snug line-clamp-1 mb-1 drop-shadow-sm">
             {recipe.title}

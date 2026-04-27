@@ -28,6 +28,10 @@ export interface Recipe {
   save_count?: number;
   is_liked_by_user?: boolean;
   is_saved_by_user?: boolean;
+  calories?: number | null;
+  protein?: number | null;
+  carbs?: number | null;
+  fat?: number | null;
 }
 
 export interface Like {

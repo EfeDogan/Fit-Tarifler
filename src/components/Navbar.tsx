@@ -8,6 +8,7 @@ import type { User } from "@supabase/supabase-js";
 
 export default function Navbar() {
   const [user, setUser] = useState<User | null>(null);
+  const [loggingOut, setLoggingOut] = useState(false);
   const { logout } = useAuth();
 
   useEffect(() => {
@@ -25,6 +26,12 @@ export default function Navbar() {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const handleLogout = () => {
+    if (loggingOut) return;
+    setLoggingOut(true);
+    logout();
+  };
 
   return (
     <nav className="border-b border-gray-100 bg-white sticky top-0 z-50">
@@ -49,10 +56,11 @@ export default function Navbar() {
                 Profilim
               </Link>
               <button
-                onClick={logout}
-                className="text-sm font-medium text-gray-400 hover:text-black transition-colors"
+                onClick={handleLogout}
+                disabled={loggingOut}
+                className="text-sm font-medium text-gray-400 hover:text-black transition-colors disabled:opacity-50"
               >
-                Çıkış
+                {loggingOut ? "Çıkış yapılıyor..." : "Çıkış"}
               </button>
             </>
           ) : (

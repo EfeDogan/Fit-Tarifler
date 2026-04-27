@@ -125,6 +125,58 @@ function CreateRecipeForm() {
         </div>
 
         <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Besin Değerleri <span className="text-gray-400 font-normal">(opsiyonel)</span>
+          </label>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label htmlFor="calories" className="block text-xs text-gray-500 mb-1">Kalori (kcal)</label>
+              <input
+                id="calories"
+                name="calories"
+                type="number"
+                min="0"
+                placeholder="350"
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label htmlFor="protein" className="block text-xs text-gray-500 mb-1">Protein (g)</label>
+              <input
+                id="protein"
+                name="protein"
+                type="number"
+                min="0"
+                placeholder="30"
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label htmlFor="carbs" className="block text-xs text-gray-500 mb-1">Karbonhidrat (g)</label>
+              <input
+                id="carbs"
+                name="carbs"
+                type="number"
+                min="0"
+                placeholder="25"
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label htmlFor="fat" className="block text-xs text-gray-500 mb-1">Yağ (g)</label>
+              <input
+                id="fat"
+                name="fat"
+                type="number"
+                min="0"
+                placeholder="12"
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div>
           <label
             htmlFor="content"
             className="block text-sm font-medium text-gray-700 mb-2"

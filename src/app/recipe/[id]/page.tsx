@@ -22,33 +22,36 @@ export default async function RecipeDetailPage({
 
   if (!recipe) notFound();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const { count: likeCount } = await supabase
-    .from("likes")
-    .select("*", { count: "exact", head: true })
-    .eq("recipe_id", id);
+  const [
+    { data: { user } },
+    { count: likeCount },
+  ] = await Promise.all([
+    supabase.auth.getUser(),
+    supabase
+      .from("likes")
+      .select("*", { count: "exact", head: true })
+      .eq("recipe_id", id),
+  ]);
 
   let isLiked = false;
   let isSaved = false;
 
   if (user) {
-    const { data: like } = await supabase
-      .from("likes")
-      .select()
-      .eq("user_id", user.id)
-      .eq("recipe_id", id)
-      .single();
+    const [{ data: like }, { data: save }] = await Promise.all([
+      supabase
+        .from("likes")
+        .select()
+        .eq("user_id", user.id)
+        .eq("recipe_id", id)
+        .single(),
+      supabase
+        .from("saves")
+        .select()
+        .eq("user_id", user.id)
+        .eq("recipe_id", id)
+        .single(),
+    ]);
     isLiked = !!like;
-
-    const { data: save } = await supabase
-      .from("saves")
-      .select()
-      .eq("user_id", user.id)
-      .eq("recipe_id", id)
-      .single();
     isSaved = !!save;
   }
 
@@ -108,6 +111,39 @@ export default async function RecipeDetailPage({
 
           {user && <LikeSaveButtons recipe={recipeFull} />}
         </header>
+
+        {(() => {
+          const hasMacros = recipe.calories || recipe.protein || recipe.carbs || recipe.fat;
+          if (!hasMacros) return null;
+          return (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8 p-4 bg-gray-50 rounded-xl">
+              {recipe.calories != null && (
+                <div className="text-center">
+                  <div className="text-xl font-bold text-gray-900">{recipe.calories}</div>
+                  <div className="text-xs text-gray-500 mt-0.5">kcal</div>
+                </div>
+              )}
+              {recipe.protein != null && (
+                <div className="text-center">
+                  <div className="text-xl font-bold text-orange-600">{recipe.protein}g</div>
+                  <div className="text-xs text-gray-500 mt-0.5">Protein</div>
+                </div>
+              )}
+              {recipe.carbs != null && (
+                <div className="text-center">
+                  <div className="text-xl font-bold text-blue-600">{recipe.carbs}g</div>
+                  <div className="text-xs text-gray-500 mt-0.5">Karbonhidrat</div>
+                </div>
+              )}
+              {recipe.fat != null && (
+                <div className="text-center">
+                  <div className="text-xl font-bold text-yellow-600">{recipe.fat}g</div>
+                  <div className="text-xs text-gray-500 mt-0.5">Yağ</div>
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         <ImageGallery images={images} />
 
