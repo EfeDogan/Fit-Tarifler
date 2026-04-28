@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import BottomNav from "@/components/BottomNav";
 import { LanguageProvider } from "@/lib/i18n/context";
 
 const geistSans = Geist({
@@ -33,7 +34,8 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-white text-[var(--foreground)]">
         <LanguageProvider>
           <Navbar />
-          <main className="flex-1">{children}</main>
+          <main className="flex-1 pb-16 md:pb-0">{children}</main>
+          <BottomNav />
         </LanguageProvider>
         <Analytics />
       </body>

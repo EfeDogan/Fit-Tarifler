@@ -18,6 +18,7 @@ export default function FeedFilters() {
   const activeMinProtein = searchParams.get("minProtein") ?? "";
   const activeMaxCarbs = searchParams.get("maxCarbs") ?? "";
   const activeMaxFat = searchParams.get("maxFat") ?? "";
+  const activeQ = searchParams.get("q") ?? "";
 
   const [optimisticSlugs, setOptimisticSlugs] = useOptimistic(activeSlugs);
 
@@ -75,10 +76,11 @@ export default function FeedFilters() {
       Object.entries(params).forEach(([key, value]) => {
         if (value) qs.set(key, value);
       });
+      if (activeQ) qs.set("q", activeQ);
       const str = qs.toString();
       router.push(`/${str ? `?${str}` : ""}`);
     },
-    [router]
+    [router, activeQ]
   );
 
   const currentParams = useMemo(() => ({

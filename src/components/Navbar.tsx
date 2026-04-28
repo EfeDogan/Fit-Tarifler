@@ -50,20 +50,20 @@ export default function Navbar() {
             <>
               <Link
                 href="/create"
-                className="text-sm font-medium text-gray-600 hover:text-black transition-colors"
+                className="hidden md:inline text-sm font-medium text-gray-600 hover:text-black transition-colors"
               >
                 {t("navbarWriteRecipe")}
               </Link>
               <Link
                 href="/profile"
-                className="text-sm font-medium text-gray-600 hover:text-black transition-colors"
+                className="hidden md:inline text-sm font-medium text-gray-600 hover:text-black transition-colors"
               >
                 {t("navbarProfile")}
               </Link>
               <button
                 onClick={handleLogout}
                 disabled={loggingOut}
-                className="text-sm font-medium text-gray-400 hover:text-black transition-colors disabled:opacity-50"
+                className="hidden md:block text-sm font-medium text-gray-400 hover:text-black transition-colors disabled:opacity-50"
               >
                 {loggingOut ? t("navbarLoggingOut") : t("navbarLogout")}
               </button>
@@ -72,13 +72,13 @@ export default function Navbar() {
             <>
               <Link
                 href="/login"
-                className="text-sm font-medium text-gray-600 hover:text-black transition-colors"
+                className="hidden md:inline text-sm font-medium text-gray-600 hover:text-black transition-colors"
               >
                 {t("navbarLogin")}
               </Link>
               <Link
                 href="/signup"
-                className="bg-black text-white px-4 py-1.5 rounded-full text-sm font-medium hover:bg-gray-800 transition-colors"
+                className="hidden md:inline bg-black text-white px-4 py-1.5 rounded-full text-sm font-medium hover:bg-gray-800 transition-colors"
               >
                 {t("navbarSignup")}
               </Link>

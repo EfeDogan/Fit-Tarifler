@@ -77,6 +77,8 @@ export type Dictionary = {
   editError: string;
   editNotAuthorized: string;
   editImageRemove: string;
+  searchPlaceholder: string;
+  searchNoResults: string;
   commentsTitle: string;
   commentsEmpty: string;
   commentsPlaceholder: string;
@@ -204,6 +206,8 @@ const tr: Dictionary = {
   editError: "Tarif güncellenirken bir hata oluştu.",
   editNotAuthorized: "Bu tarifi düzenleme yetkiniz yok.",
   editImageRemove: "Kaldır",
+  searchPlaceholder: "Tarif ara...",
+  searchNoResults: "Sonuç bulunamadı.",
   commentsTitle: "Yorumlar",
   commentsEmpty: "Henüz yorum yapılmamış. İlk yorumu siz yapın!",
   commentsPlaceholder: "Yorumunuzu yazın...",
@@ -298,6 +302,8 @@ const en: Dictionary = {
   editError: "An error occurred while updating the recipe.",
   editNotAuthorized: "You are not authorized to edit this recipe.",
   editImageRemove: "Remove",
+  searchPlaceholder: "Search recipes...",
+  searchNoResults: "No results found.",
   commentsTitle: "Comments",
   commentsEmpty: "No comments yet. Be the first to comment!",
   commentsPlaceholder: "Write your comment...",
