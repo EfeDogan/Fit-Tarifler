@@ -3,9 +3,11 @@
 import { useOptimistic, useTransition } from "react";
 import { toggleLike, toggleSave } from "@/lib/actions/recipes";
 import type { Recipe } from "@/types/database";
+import { useLanguage } from "@/lib/i18n/context";
 
 export default function LikeSaveButtons({ recipe }: { recipe: Recipe }) {
   const [, startTransition] = useTransition();
+  const { t } = useLanguage();
 
   const [optimistic, setOptimistic] = useOptimistic({
     is_liked_by_user: recipe.is_liked_by_user ?? false,
@@ -60,7 +62,7 @@ export default function LikeSaveButtons({ recipe }: { recipe: Recipe }) {
             : "bg-gray-50 text-gray-500 hover:bg-gray-100"
         }`}
       >
-        {optimistic.is_saved_by_user ? "★" : "☆"} Kaydet
+        {optimistic.is_saved_by_user ? "★" : "☆"} {t("saveButton")}
       </button>
     </div>
   );

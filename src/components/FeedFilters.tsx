@@ -3,48 +3,12 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, useCallback, useMemo, useOptimistic, startTransition } from "react";
 import type { Label } from "@/types/database";
-
-const CALORIE_OPTIONS = [
-  { value: "", label: "Kalori" },
-  { value: "200", label: "200 altı" },
-  { value: "300", label: "300 altı" },
-  { value: "400", label: "400 altı" },
-  { value: "500", label: "500 altı" },
-  { value: "600", label: "600 altı" },
-  { value: "700", label: "700 altı" },
-];
-
-const PROTEIN_OPTIONS = [
-  { value: "", label: "Protein" },
-  { value: "10", label: "10g+" },
-  { value: "15", label: "15g+" },
-  { value: "20", label: "20g+" },
-  { value: "25", label: "25g+" },
-  { value: "30", label: "30g+" },
-  { value: "40", label: "40g+" },
-  { value: "50", label: "50g+" },
-];
-
-const CARBS_OPTIONS = [
-  { value: "", label: "Karb" },
-  { value: "10", label: "10g altı" },
-  { value: "20", label: "20g altı" },
-  { value: "30", label: "30g altı" },
-  { value: "50", label: "50g altı" },
-];
-
-const FAT_OPTIONS = [
-  { value: "", label: "Yağ" },
-  { value: "5", label: "5g altı" },
-  { value: "10", label: "10g altı" },
-  { value: "15", label: "15g altı" },
-  { value: "20", label: "20g altı" },
-  { value: "30", label: "30g altı" },
-];
+import { useLanguage } from "@/lib/i18n/context";
 
 export default function FeedFilters() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { t, locale, tLabel } = useLanguage();
   const [labels, setLabels] = useState<Label[]>([]);
   const activeSlugs = useMemo(
     () => new Set(searchParams.get("labels")?.split(",").filter(Boolean) ?? []),
@@ -63,6 +27,44 @@ export default function FeedFilters() {
       .then((data) => setLabels(data))
       .catch(() => {});
   }, []);
+
+  const CALORIE_OPTIONS = [
+    { value: "", label: t("filterCalorie") },
+    { value: "200", label: `200 ${t("filterCalorieUnder")}` },
+    { value: "300", label: `300 ${t("filterCalorieUnder")}` },
+    { value: "400", label: `400 ${t("filterCalorieUnder")}` },
+    { value: "500", label: `500 ${t("filterCalorieUnder")}` },
+    { value: "600", label: `600 ${t("filterCalorieUnder")}` },
+    { value: "700", label: `700 ${t("filterCalorieUnder")}` },
+  ];
+
+  const PROTEIN_OPTIONS = [
+    { value: "", label: t("filterProtein") },
+    { value: "10", label: "10g+" },
+    { value: "15", label: "15g+" },
+    { value: "20", label: "20g+" },
+    { value: "25", label: "25g+" },
+    { value: "30", label: "30g+" },
+    { value: "40", label: "40g+" },
+    { value: "50", label: "50g+" },
+  ];
+
+  const CARBS_OPTIONS = [
+    { value: "", label: t("filterCarbs") },
+    { value: "10", label: `10g ${t("filterCarbsUnder")}` },
+    { value: "20", label: `20g ${t("filterCarbsUnder")}` },
+    { value: "30", label: `30g ${t("filterCarbsUnder")}` },
+    { value: "50", label: `50g ${t("filterCarbsUnder")}` },
+  ];
+
+  const FAT_OPTIONS = [
+    { value: "", label: t("filterFat") },
+    { value: "5", label: `5g ${t("filterFatUnder")}` },
+    { value: "10", label: `10g ${t("filterFatUnder")}` },
+    { value: "15", label: `15g ${t("filterFatUnder")}` },
+    { value: "20", label: `20g ${t("filterFatUnder")}` },
+    { value: "30", label: `30g ${t("filterFatUnder")}` },
+  ];
 
   const buildUrl = useCallback(
     (nextLabels: Set<string>, params: Record<string, string>) => {
@@ -127,7 +129,7 @@ export default function FeedFilters() {
   if (labels.length === 0) return null;
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3" key={locale}>
       <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
         <button
           onClick={clearAll}
@@ -137,7 +139,7 @@ export default function FeedFilters() {
               : "bg-gray-50 text-gray-500 hover:bg-gray-100"
           }`}
         >
-          Tümü
+          {t("filterAll")}
         </button>
         {labels.map((label) => (
           <button
@@ -154,13 +156,14 @@ export default function FeedFilters() {
                 : {}
             }
           >
-            {label.name}
+            {tLabel(label.slug)}
           </button>
         ))}
       </div>
 
       <div className="flex items-center gap-2 flex-wrap">
         <select
+          key={`protein-${locale}`}
           value={activeMinProtein}
           onChange={(e) => handleNutritionChange("minProtein", e.target.value)}
           className={`px-2.5 py-1.5 rounded-lg text-xs font-medium border-0 outline-none cursor-pointer appearance-none bg-gray-50 text-gray-600 hover:bg-gray-100 ${activeMinProtein ? "!bg-green-600 !text-white" : ""}`}
@@ -173,6 +176,7 @@ export default function FeedFilters() {
         </select>
 
         <select
+          key={`calories-${locale}`}
           value={activeMaxCalories}
           onChange={(e) => handleNutritionChange("maxCalories", e.target.value)}
           className={`px-2.5 py-1.5 rounded-lg text-xs font-medium border-0 outline-none cursor-pointer appearance-none bg-gray-50 text-gray-600 hover:bg-gray-100 ${activeMaxCalories ? "!bg-orange-600 !text-white" : ""}`}
@@ -185,6 +189,7 @@ export default function FeedFilters() {
         </select>
 
         <select
+          key={`carbs-${locale}`}
           value={activeMaxCarbs}
           onChange={(e) => handleNutritionChange("maxCarbs", e.target.value)}
           className={`px-2.5 py-1.5 rounded-lg text-xs font-medium border-0 outline-none cursor-pointer appearance-none bg-gray-50 text-gray-600 hover:bg-gray-100 ${activeMaxCarbs ? "!bg-blue-600 !text-white" : ""}`}
@@ -197,6 +202,7 @@ export default function FeedFilters() {
         </select>
 
         <select
+          key={`fat-${locale}`}
           value={activeMaxFat}
           onChange={(e) => handleNutritionChange("maxFat", e.target.value)}
           className={`px-2.5 py-1.5 rounded-lg text-xs font-medium border-0 outline-none cursor-pointer appearance-none bg-gray-50 text-gray-600 hover:bg-gray-100 ${activeMaxFat ? "!bg-yellow-600 !text-white" : ""}`}

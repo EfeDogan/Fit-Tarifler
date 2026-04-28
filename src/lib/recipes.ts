@@ -15,7 +15,7 @@ export function useRecipes() {
       data: { user },
     } = await supabase.auth.getUser();
 
-    if (!user) return { error: "Giriş yapmanız gerekiyor." };
+    if (!user) return { error: "AUTH_REQUIRED" };
 
     const title = formData.get("title") as string;
     const description = (formData.get("description") as string) || null;
@@ -66,7 +66,7 @@ export function useRecipes() {
       .single();
 
     if (error || !recipe) {
-      return { error: error?.message || "Tarif oluşturulurken bir hata oluştu." };
+      return { error: error?.message || "RECIPE_CREATE_ERROR" };
     }
 
     if (labelIds.length > 0) {

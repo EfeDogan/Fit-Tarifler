@@ -4,7 +4,10 @@ import Link from "next/link";
 import LikeSaveButtons from "@/components/LikeSaveButtons";
 import ImageGallery from "@/components/ImageGallery";
 import DeleteRecipeButton from "@/components/DeleteRecipeButton";
-import type { Recipe } from "@/types/database";
+import CommentSection from "@/components/CommentSection";
+import { RecipeDetailText, LabelText } from "@/components/RecipeDetailText";
+import EditRecipeButton from "@/components/EditRecipeButton";
+import type { Recipe, Comment } from "@/types/database";
 
 export default async function RecipeDetailPage({
   params,
@@ -65,6 +68,21 @@ export default async function RecipeDetailPage({
   const isOwner = user?.id === recipe.author_id;
   const images: string[] = recipe.image_urls ?? [];
 
+  const { data: commentsData } = await supabase
+    .from("comments")
+    .select("*, profiles!user_id(username, avatar_url)")
+    .eq("recipe_id", id)
+    .order("created_at", { ascending: true });
+
+  const comments: Comment[] = (commentsData ?? []).map((c) => ({
+    id: c.id,
+    recipe_id: c.recipe_id,
+    user_id: c.user_id,
+    content: c.content,
+    created_at: c.created_at,
+    profiles: c.profiles,
+  }));
+
   return (
     <div className="max-w-2xl mx-auto px-6 py-10">
       <article>
@@ -96,13 +114,13 @@ export default async function RecipeDetailPage({
           {recipe.labels && recipe.labels.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mb-5">
               {recipe.labels.map(
-                (label: { id: string; name: string; color: string }) => (
+                (label: { id: string; name: string; slug: string; color: string }) => (
                   <span
                     key={label.id}
                     className="px-2.5 py-1 rounded-full text-xs font-medium text-white"
                     style={{ backgroundColor: label.color }}
                   >
-                    {label.name}
+                    <LabelText slug={label.slug} fallback={label.name} />
                   </span>
                 )
               )}
@@ -120,25 +138,25 @@ export default async function RecipeDetailPage({
               {recipe.calories != null && (
                 <div className="text-center">
                   <div className="text-xl font-bold text-gray-900">{recipe.calories}</div>
-                  <div className="text-xs text-gray-500 mt-0.5">kcal</div>
+                  <div className="text-xs text-gray-500 mt-0.5"><RecipeDetailText textKey="kcal" /></div>
                 </div>
               )}
               {recipe.protein != null && (
                 <div className="text-center">
                   <div className="text-xl font-bold text-orange-600">{recipe.protein}g</div>
-                  <div className="text-xs text-gray-500 mt-0.5">Protein</div>
+                  <div className="text-xs text-gray-500 mt-0.5"><RecipeDetailText textKey="proteinLabel" /></div>
                 </div>
               )}
               {recipe.carbs != null && (
                 <div className="text-center">
                   <div className="text-xl font-bold text-blue-600">{recipe.carbs}g</div>
-                  <div className="text-xs text-gray-500 mt-0.5">Karbonhidrat</div>
+                  <div className="text-xs text-gray-500 mt-0.5"><RecipeDetailText textKey="carbsLabel" /></div>
                 </div>
               )}
               {recipe.fat != null && (
                 <div className="text-center">
                   <div className="text-xl font-bold text-yellow-600">{recipe.fat}g</div>
-                  <div className="text-xs text-gray-500 mt-0.5">Yağ</div>
+                  <div className="text-xs text-gray-500 mt-0.5"><RecipeDetailText textKey="fatLabel" /></div>
                 </div>
               )}
             </div>
@@ -154,17 +172,26 @@ export default async function RecipeDetailPage({
 
         {isOwner && (
           <div className="mt-10 pt-6 border-t border-gray-100 flex items-center gap-4">
+            <EditRecipeButton recipeId={recipe.id} />
             <DeleteRecipeButton recipeId={recipe.id} />
           </div>
         )}
       </article>
+
+      <div className="mt-10 pt-8 border-t border-gray-100">
+        <CommentSection
+          recipeId={recipe.id}
+          comments={comments}
+          currentUserId={user?.id ?? null}
+        />
+      </div>
 
       <div className="mt-10 pt-6 border-t border-gray-100">
         <Link
           href="/"
           className="text-sm text-gray-400 hover:text-black transition-colors"
         >
-          ← Geri Dön
+          <RecipeDetailText textKey="recipeBack" />
         </Link>
       </div>
     </div>

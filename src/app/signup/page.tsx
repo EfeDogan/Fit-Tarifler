@@ -3,9 +3,11 @@
 import { useAuth } from "@/lib/auth";
 import Link from "next/link";
 import { useState } from "react";
+import { useLanguage } from "@/lib/i18n/context";
 
 export default function SignupPage() {
   const { signup } = useAuth();
+  const { t } = useLanguage();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -31,9 +33,9 @@ export default function SignupPage() {
     <div className="min-h-screen flex items-center justify-center bg-white">
       <div className="w-full max-w-sm px-6">
         <h1 className="text-4xl font-bold text-center mb-2 tracking-tight">
-          Fit Recipe
+          {t("signupTitle")}
         </h1>
-        <p className="text-gray-500 text-center mb-8">Yeni hesap oluşturun</p>
+        <p className="text-gray-500 text-center mb-8">{t("signupSubtitle")}</p>
 
         {error && (
           <div className="bg-red-50 text-red-600 text-sm p-3 rounded-lg mb-6">
@@ -47,7 +49,7 @@ export default function SignupPage() {
               htmlFor="username"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Kullanıcı Adı
+              {t("signupUsernameLabel")}
             </label>
             <input
               id="username"
@@ -64,7 +66,7 @@ export default function SignupPage() {
               htmlFor="email"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              E-posta
+              {t("signupEmailLabel")}
             </label>
             <input
               id="email"
@@ -81,7 +83,7 @@ export default function SignupPage() {
               htmlFor="password"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Şifre
+              {t("signupPasswordLabel")}
             </label>
             <input
               id="password"
@@ -99,17 +101,17 @@ export default function SignupPage() {
             disabled={loading}
             className="w-full bg-black text-white py-2.5 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors disabled:opacity-50"
           >
-            {loading ? "Kayıt olunuyor..." : "Kayıt Ol"}
+            {loading ? t("signupSubmitting") : t("signupSubmit")}
           </button>
         </form>
 
         <p className="text-center text-sm text-gray-500 mt-6">
-          Zaten hesabınız var mı?{" "}
+          {t("signupHasAccount")}{" "}
           <Link
             href="/login"
             className="text-black font-medium hover:underline"
           >
-            Giriş Yap
+            {t("loginSubmit")}
           </Link>
         </p>
       </div>

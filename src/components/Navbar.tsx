@@ -2,14 +2,17 @@
 
 import Link from "next/link";
 import { useAuth } from "@/lib/auth";
+import { useLanguage } from "@/lib/i18n/context";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 export default function Navbar() {
   const [user, setUser] = useState<User | null>(null);
   const [loggingOut, setLoggingOut] = useState(false);
   const { logout } = useAuth();
+  const { t } = useLanguage();
 
   useEffect(() => {
     const supabase = createClient();
@@ -37,30 +40,32 @@ export default function Navbar() {
     <nav className="border-b border-gray-100 bg-white sticky top-0 z-50">
       <div className="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between">
         <Link href="/" className="text-xl font-bold tracking-tight">
-          Fit Recipe
+          {t("siteTitle")}
         </Link>
 
         <div className="flex items-center gap-4">
+          <LanguageSwitcher />
+
           {user ? (
             <>
               <Link
                 href="/create"
                 className="text-sm font-medium text-gray-600 hover:text-black transition-colors"
               >
-                Tarif Yaz
+                {t("navbarWriteRecipe")}
               </Link>
               <Link
                 href="/profile"
                 className="text-sm font-medium text-gray-600 hover:text-black transition-colors"
               >
-                Profilim
+                {t("navbarProfile")}
               </Link>
               <button
                 onClick={handleLogout}
                 disabled={loggingOut}
                 className="text-sm font-medium text-gray-400 hover:text-black transition-colors disabled:opacity-50"
               >
-                {loggingOut ? "Çıkış yapılıyor..." : "Çıkış"}
+                {loggingOut ? t("navbarLoggingOut") : t("navbarLogout")}
               </button>
             </>
           ) : (
@@ -69,13 +74,13 @@ export default function Navbar() {
                 href="/login"
                 className="text-sm font-medium text-gray-600 hover:text-black transition-colors"
               >
-                Giriş
+                {t("navbarLogin")}
               </Link>
               <Link
                 href="/signup"
                 className="bg-black text-white px-4 py-1.5 rounded-full text-sm font-medium hover:bg-gray-800 transition-colors"
               >
-                Kayıt Ol
+                {t("navbarSignup")}
               </Link>
             </>
           )}

@@ -3,9 +3,11 @@
 import { useAuth } from "@/lib/auth";
 import Link from "next/link";
 import { useState } from "react";
+import { useLanguage } from "@/lib/i18n/context";
 
 export default function LoginPage() {
   const { login } = useAuth();
+  const { t } = useLanguage();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -21,7 +23,9 @@ export default function LoginPage() {
     );
 
     if (errMsg) {
-      setError(errMsg);
+      setError(
+        errMsg === "Invalid login credentials" ? t("loginError") : errMsg
+      );
       setLoading(false);
     }
   };
@@ -30,17 +34,15 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-white">
       <div className="w-full max-w-sm px-6">
         <h1 className="text-4xl font-bold text-center mb-2 tracking-tight">
-          Fit Recipe
+          {t("loginTitle")}
         </h1>
         <p className="text-gray-500 text-center mb-8">
-          Hesabınıza giriş yapın
+          {t("loginSubtitle")}
         </p>
 
         {error && (
           <div className="bg-red-50 text-red-600 text-sm p-3 rounded-lg mb-6">
-            {error === "Invalid login credentials"
-              ? "E-posta veya şifre hatalı."
-              : error}
+            {error}
           </div>
         )}
 
@@ -50,7 +52,7 @@ export default function LoginPage() {
               htmlFor="email"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              E-posta
+              {t("loginEmailLabel")}
             </label>
             <input
               id="email"
@@ -67,7 +69,7 @@ export default function LoginPage() {
               htmlFor="password"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Şifre
+              {t("loginPasswordLabel")}
             </label>
             <input
               id="password"
@@ -84,17 +86,17 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full bg-black text-white py-2.5 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors disabled:opacity-50"
           >
-            {loading ? "Giriş yapılıyor..." : "Giriş Yap"}
+            {loading ? t("loginSubmitting") : t("loginSubmit")}
           </button>
         </form>
 
         <p className="text-center text-sm text-gray-500 mt-6">
-          Hesabınız yok mu?{" "}
+          {t("loginNoAccount")}{" "}
           <Link
             href="/signup"
             className="text-black font-medium hover:underline"
           >
-            Kayıt Ol
+            {t("navbarSignup")}
           </Link>
         </p>
       </div>

@@ -25,6 +25,7 @@ export interface Recipe {
   likes?: Like[];
   saves?: Save[];
   like_count?: number;
+  comment_count?: number;
   save_count?: number;
   is_liked_by_user?: boolean;
   is_saved_by_user?: boolean;
@@ -42,4 +43,16 @@ export interface Like {
 export interface Save {
   user_id: string;
   recipe_id: string;
+}
+
+export interface Comment {
+  id: string;
+  recipe_id: string;
+  user_id: string;
+  content: string;
+  created_at: string;
+  profiles?: {
+    username: string;
+    avatar_url: string | null;
+  };
 }

@@ -1,12 +1,18 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import type { Recipe } from "@/types/database";
+import { useLanguage } from "@/lib/i18n/context";
 
 export default function RecipeCard({ recipe }: { recipe: Recipe }) {
+  const { t, tLabel } = useLanguage();
   const firstImage =
     recipe.image_urls && recipe.image_urls.length > 0
       ? recipe.image_urls[0]
       : null;
+
+  const hasNutrition = recipe.calories != null || recipe.protein != null;
 
   return (
     <Link href={`/recipe/${recipe.id}`}>
@@ -31,7 +37,7 @@ export default function RecipeCard({ recipe }: { recipe: Recipe }) {
                 className="px-2 py-0.5 rounded-full text-[10px] font-semibold text-white bg-black/30 backdrop-blur-sm"
                 style={{ borderLeft: `2px solid ${label.color}` }}
               >
-                {label.name}
+                {tLabel(label.slug)}
               </span>
             ))}
           </div>
@@ -39,11 +45,18 @@ export default function RecipeCard({ recipe }: { recipe: Recipe }) {
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-        {recipe.calories != null && (
-          <div className="absolute top-3 right-3 z-10">
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-black/40 backdrop-blur-sm text-white">
-              {recipe.calories} kcal
-            </span>
+        {hasNutrition && (
+          <div className="absolute top-3 right-3 z-10 flex flex-col gap-1">
+            {recipe.calories != null && (
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-black/40 backdrop-blur-sm text-white">
+                {recipe.calories} {t("kcal")}
+              </span>
+            )}
+            {recipe.protein != null && (
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-black/40 backdrop-blur-sm text-white">
+                {recipe.protein}g {t("proteinLabel")}
+              </span>
+            )}
           </div>
         )}
 
@@ -64,11 +77,32 @@ export default function RecipeCard({ recipe }: { recipe: Recipe }) {
             </span>
             <span>·</span>
             <span>
-              {new Date(recipe.created_at).toLocaleDateString("tr-TR", {
-                day: "numeric",
-                month: "short",
-              })}
+              {new Date(recipe.created_at).toLocaleDateString(
+                "tr-TR",
+                {
+                  day: "numeric",
+                  month: "short",
+                }
+              )}
             </span>
+            {((recipe.like_count ?? 0) > 0 || (recipe.comment_count ?? 0) > 0) && (
+              <>
+                <span>·</span>
+                {(recipe.like_count ?? 0) > 0 && (
+                  <span className="flex items-center gap-0.5">
+                    ♥ {recipe.like_count}
+                  </span>
+                )}
+                {(recipe.like_count ?? 0) > 0 && (recipe.comment_count ?? 0) > 0 && (
+                  <span>·</span>
+                )}
+                {(recipe.comment_count ?? 0) > 0 && (
+                  <span className="flex items-center gap-0.5">
+                    💬 {recipe.comment_count}
+                  </span>
+                )}
+              </>
+            )}
           </div>
         </div>
       </article>

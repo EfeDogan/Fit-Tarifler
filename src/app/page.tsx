@@ -3,6 +3,7 @@ import RecipeCard from "@/components/RecipeCard";
 import FeedFilters from "@/components/FeedFilters";
 import type { Recipe } from "@/types/database";
 import { Suspense } from "react";
+import { HomeText } from "@/components/HomeText";
 
 export default async function HomePage({
   searchParams,
@@ -67,8 +68,36 @@ export default async function HomePage({
     supabase.auth.getUser(),
   ]);
 
+  const recipeIds = (recipes ?? []).map((r) => r.id);
+
+  const likeCountsMap = new Map<string, number>();
+  const commentCountsMap = new Map<string, number>();
   let likedRecipeIds: string[] = [];
   let savedRecipeIds: string[] = [];
+
+  if (recipeIds.length > 0) {
+    const [{ data: likeCounts }, { data: commentCounts }] = await Promise.all([
+      supabase
+        .from("likes")
+        .select("recipe_id")
+        .in("recipe_id", recipeIds),
+      supabase
+        .from("comments")
+        .select("recipe_id")
+        .in("recipe_id", recipeIds),
+    ]);
+
+    if (likeCounts) {
+      for (const l of likeCounts) {
+        likeCountsMap.set(l.recipe_id, (likeCountsMap.get(l.recipe_id) ?? 0) + 1);
+      }
+    }
+    if (commentCounts) {
+      for (const c of commentCounts) {
+        commentCountsMap.set(c.recipe_id, (commentCountsMap.get(c.recipe_id) ?? 0) + 1);
+      }
+    }
+  }
 
   if (user) {
     const [{ data: likes }, { data: saves }] = await Promise.all([
@@ -87,7 +116,8 @@ export default async function HomePage({
 
   const recipesWithLikes: Recipe[] = (recipes ?? []).map((recipe) => ({
     ...recipe,
-    like_count: 0,
+    like_count: likeCountsMap.get(recipe.id) ?? 0,
+    comment_count: commentCountsMap.get(recipe.id) ?? 0,
     is_liked_by_user: likedRecipeIds.includes(recipe.id),
     is_saved_by_user: savedRecipeIds.includes(recipe.id),
   }));
@@ -97,7 +127,7 @@ export default async function HomePage({
       <div className="py-12 text-center border-b border-gray-100 mb-8">
         <h1 className="text-5xl font-bold tracking-tight mb-3">Fit Recipe</h1>
         <p className="text-gray-500 text-lg max-w-md mx-auto">
-          Sağlıklı tariflerinizi paylaşın, başkalarının tariflerini keşfedin.
+          <HomeText textKey="homeHeroSubtitle" />
         </p>
       </div>
 
@@ -109,16 +139,14 @@ export default async function HomePage({
 
       {recipesError && (
         <div className="bg-red-50 text-red-600 text-sm p-4 rounded-lg my-6">
-          Tarifler yüklenirken hata oluştu: {recipesError.message}
+          <HomeText textKey="homeError" /> {recipesError.message}
         </div>
       )}
 
       {!recipesError && recipesWithLikes.length === 0 ? (
         <div className="py-20 text-center">
-          <p className="text-gray-400 text-lg">Henüz tarif yok.</p>
-          <p className="text-gray-400 text-sm mt-2">
-            İlk tarifi siz paylaşın!
-          </p>
+          <p className="text-gray-400 text-lg"><HomeText textKey="homeEmpty" /></p>
+          <p className="text-gray-400 text-sm mt-2"><HomeText textKey="homeEmptySub" /></p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
